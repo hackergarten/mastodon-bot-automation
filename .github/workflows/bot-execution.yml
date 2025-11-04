@@ -37,10 +37,31 @@ jobs:
         run: |
           cp current-repo/events.json bot-repo/events.json
       
+      - name: Validate environment variables
+        env:
+          MASTODON_API_BASE_URL: ${{ env.MASTODON_API_BASE_URL }}
+        run: |
+          if [ -z "$MASTODON_API_BASE_URL" ]; then
+            echo "Error: MASTODON_API_BASE_URL is not set"
+            exit 1
+          fi
+          # Check if URL looks valid (should start with http:// or https://)
+          if [[ ! "$MASTODON_API_BASE_URL" =~ ^https?:// ]]; then
+            echo "Error: MASTODON_API_BASE_URL should start with http:// or https://"
+            echo "Current value starts with: ${MASTODON_API_BASE_URL:0:10}"
+            exit 1
+          fi
+          # Check if URL is not just "https://" or "http://"
+          if [[ "$MASTODON_API_BASE_URL" =~ ^https?://$ ]] || [[ "$MASTODON_API_BASE_URL" == "https" ]] || [[ "$MASTODON_API_BASE_URL" == "http" ]]; then
+            echo "Error: MASTODON_API_BASE_URL appears to be incomplete. It should be a full URL like https://mastodon.social"
+            exit 1
+          fi
+          echo "MASTODON_API_BASE_URL validation passed"
+      
       - name: Run mastodon reminder bot
         working-directory: bot-repo
         env:
-          MASTODON_API_BASE_URL: ${{ secrets.MASTODON_API_BASE_URL }}
+          MASTODON_API_BASE_URL: ${{ env.MASTODON_API_BASE_URL }}
           MASTODON_CLIENT_ID: ${{ secrets.MASTODON_CLIENT_ID }}
           MASTODON_CLIENT_SECRET: ${{ secrets.MASTODON_CLIENT_SECRET }}
           MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
