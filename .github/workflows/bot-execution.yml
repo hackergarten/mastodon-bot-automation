@@ -39,7 +39,7 @@ jobs:
       
       - name: Validate environment variables
         env:
-          MASTODON_API_BASE_URL: ${{ env.MASTODON_API_BASE_URL }}
+          MASTODON_API_BASE_URL: ${{ vars.MASTODON_API_BASE_URL }}
         run: |
           if [ -z "$MASTODON_API_BASE_URL" ]; then
             echo "Error: MASTODON_API_BASE_URL is not set"
@@ -61,7 +61,7 @@ jobs:
       - name: Run mastodon reminder bot
         working-directory: bot-repo
         env:
-          MASTODON_API_BASE_URL: ${{ env.MASTODON_API_BASE_URL }}
+          MASTODON_API_BASE_URL: ${{ vars.MASTODON_API_BASE_URL }}
           MASTODON_CLIENT_ID: ${{ secrets.MASTODON_CLIENT_ID }}
           MASTODON_CLIENT_SECRET: ${{ secrets.MASTODON_CLIENT_SECRET }}
           MASTODON_ACCESS_TOKEN: ${{ secrets.MASTODON_ACCESS_TOKEN }}
